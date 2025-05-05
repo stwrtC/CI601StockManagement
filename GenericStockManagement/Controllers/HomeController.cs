@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using GenericStockManagement.Models;
+using GenericStockManagement.Repositories;
+using GenericStockManagement.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GenericStockManagement.Controllers
@@ -7,15 +9,25 @@ namespace GenericStockManagement.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        public readonly IRepository<Product> _productRepository;
+        public readonly IRepository<Category> _categoryRepository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IRepository<Product> productRepo, IRepository<Category> categoryRepo)
         {
             _logger = logger;
+            _productRepository = productRepo;
+            _categoryRepository = categoryRepo;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var products = _productRepository.GetAll(); 
+            var categories = _categoryRepository.GetAll(); 
+
+            var model = new HomeViewModel(products, categories); 
+    
+
+            return View(model);
         }
 
         public IActionResult Privacy()

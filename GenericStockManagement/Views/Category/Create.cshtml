@@ -1,0 +1,26 @@
+﻿@model Category
+
+<form asp-action="Create" method="post" role="form">
+    <h3>Adding new Category to repository</h3>
+    <h4>Fields with * are required</h4>
+
+    <div>
+        <div>
+
+            <div>
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+            </div>
+            <div>
+                <label asp-for="Description" class="form-label"></label>
+                <input asp-for="Description" class="form-control" />
+            </div>
+        </div>
+        <div>
+            <div>
+                <input type="submit" class="btn btn-secondary" value="Submit new Category" />
+            </div>
+        </div>
+    </div>
+
+</form>

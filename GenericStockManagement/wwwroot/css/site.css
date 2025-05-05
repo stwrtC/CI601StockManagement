@@ -20,3 +20,40 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* Parent div to align content to the left */
+.button-container {
+    display: flex;
+    justify-content: flex-start; /* Aligns content to the left */
+    gap: 8px; /* Optional spacing between buttons */
+}
+
+
+/* Button styles */
+.Stock-Actions,
+.Add-Stock {
+    padding: 4px 8px;
+    font-size: 14px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+    /* Image wrapper inside Stock-Actions */
+    .Stock-Actions span {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* Icon styles */
+    .Stock-Actions img,
+    .Add-Stock img {
+        width: 16px;
+        height: 16px;
+        vertical-align: middle;
+    }

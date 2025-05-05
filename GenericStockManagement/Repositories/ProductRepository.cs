@@ -45,7 +45,6 @@ namespace GenericStockManagement.Repositories
                 product.Name = item.Name;
                 product.Description = item.Description;
                 product.Price = item.Price;
-                product.Category = item.Category;
                 product.Quantity = item.Quantity;
                 product.Brand = item.Brand;
                 product.ImageThumbnail = item.ImageThumbnail;

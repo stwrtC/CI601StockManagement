@@ -1,8 +1,111 @@
-﻿@{
+﻿@using GenericStockManagement.ViewModels
+@model HomeViewModel
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    
+	<div>
+		<div class="button-container">
+			<span>
+			<button class="Stock-Actions">
+				<span>
+					<img src="images/box-open.svg" alt="Alternate Text" />
+					<img src="images/angle-small-down.svg" alt="Alternate Text" />
+				</span>
+			</button>
+				<button id="addStockBtn" class="Add-Stock" data-bs-toggle="modal" data-bs-target="#addProductModal">
+				<img src="images/plus.svg" alt="Alternate Text" />
+			</button>
+			</span>
+		</div>
+		<table class="table">
+			<thead>
+				<tr>
+					<th><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"></th>
+					<th>ID</th>
+					<th>Product Name</th>
+					<th>Category</th>
+					<th>Brand</th>
+					<th>Description</th>
+					<th>Price</th>
+					<th>Quantity</th>
+					<th>Image</th>
+				</tr>
+			</thead>
+			<tbody>
+				@{
+					if (Model._products.Any())
+					{
+						foreach (var product in Model._products)
+						{
+							<tr>
+								<td> <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"></td>
+								<td>@product.Id</td>
+								<td>@product.Name</td>
+								<td>@Model._categories?.FirstOrDefault(x => x.Id == product.Id).Name</td>
+								<td>@product.Brand</td>
+								<td>@product.Description</td>
+								<td>@product.Price</td>
+								<td>@product.Quantity</td>
+								<td><img src="@product.ImageThumbnail" alt="Product Image" /></td>
+							</tr>
+						}
+					}else
+					{
+						<tr>
+							<td colspan="6">No products available</td>
+						</tr>
+					}
+				}
+			
+			</tbody>
+		</table>
+	</div>
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Category Name</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			@{
+				if (Model._categories.Any())
+				{
+					foreach (var category in Model._categories)
+					{
+						<tr>
+							<td>@category.Name</td>
+							<td>@category.Description</td>
+						</tr>
+					}
+				}else
+				{
+					<tr>
+						<td colspan="3">No categories available</td>
+					</tr>
+				}
+			}
+			
+			
+		</tbody>
+	</table>
 </div>
+
+@section Scripts {
+	<script>
+		$(document).on("click", "#addStockBtn", function () {
+			$.get("/Views/Product/Create.cshtml", function (html) {
+				$("#modalContainer").html(html);
+				var modal = new bootstrap.Modal(document.getElementById("addProductModal"));
+				modal.show();
+			});
+		});
+	</script>
+}

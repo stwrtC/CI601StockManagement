@@ -16,11 +16,20 @@ namespace GenericStockManagement
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>()
-                .HasOne(c => c.Category)
-                .WithMany(b => b.Products)
+                .HasOne<Category>()
+                .WithMany()
                 .HasForeignKey(f => f.CategoryId);
             base.OnModelCreating(modelBuilder);
         }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = StockDataBase");
+            }
+        }
+
 
 
     }
