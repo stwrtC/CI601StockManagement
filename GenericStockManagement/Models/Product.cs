@@ -26,7 +26,5 @@ namespace GenericStockManagement.Models
 
         [Required(ErrorMessage = "Please select a category.")]
         public int CategoryId { get; set; }
-
-
     }
 }

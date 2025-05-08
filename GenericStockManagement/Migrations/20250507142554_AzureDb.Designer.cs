@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GenericStockManagement.Migrations
 {
     [DbContext(typeof(StockDbContext))]
-    [Migration("20250504185825_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250507142554_AzureDb")]
+    partial class AzureDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

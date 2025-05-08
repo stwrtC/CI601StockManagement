@@ -21,11 +21,11 @@ namespace GenericStockManagement.Controllers
 
         public IActionResult Index()
         {
-            var products = _productRepository.GetAll(); 
-            var categories = _categoryRepository.GetAll(); 
+            var products = _productRepository.GetAll();
+            var categories = _categoryRepository.GetAll();
 
-            var model = new HomeViewModel(products, categories); 
-    
+            var model = new HomeViewModel(products, categories);
+
 
             return View(model);
         }
@@ -40,5 +40,31 @@ namespace GenericStockManagement.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public IActionResult StockActions(List<int> selectedIds, string submitButton)
+        {
+            if (submitButton == "Delete")
+            {
+                return RedirectToAction("Delete", "Product", new { ids = selectedIds});
+            }
+            else if (submitButton == "Update")
+            {
+                return RedirectToAction("Update", "Product", new { ids = selectedIds});
+            }
+            return RedirectToAction("Index");
+        }
+        public IActionResult CategoryActions(List<int> selectedCatIds, string submitButton)
+        {
+            if (submitButton == "Delete")
+            {
+                return RedirectToAction("Delete", "Category", new { ids = selectedCatIds });
+            }
+            else if (submitButton == "Update")
+            {
+                return RedirectToAction("Update", "Category", new { ids = selectedCatIds });
+            }
+            return RedirectToAction("Index");
+        }
+
     }
 }

@@ -1,0 +1,65 @@
+﻿@using GenericStockManagement.ViewModels
+@model CategoryListViewModel
+
+
+<h2>Delete Categories</h2>
+
+<form asp-action="ConfirmDelete" method="post">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Category Name</th>
+                <th>Description</th>
+                <th>Associated Products</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in Model._categories)
+            {
+                var products = Model.CategoryProducts.ContainsKey(category.Id) ? Model.CategoryProducts[category.Id] : new List<GenericStockManagement.Models.Product>();
+                var hasProducts = products.Any();
+
+                <tr class="@(hasProducts ? "table-warning" : "")">
+                    <td>
+                        <input type="hidden" name="selectedIds" value="@category.Id" />
+                        @category.Name
+                    </td>
+                    <td>@category.Description</td>
+                    <td>
+                        @if (hasProducts)
+                        {
+                            <strong class="text-danger">⚠️ This category has @products.Count product(s):</strong>
+                            <ul class="text-danger small">
+                                @foreach (var product in products)
+                                {
+                                    <li>@product.Name (ID: @product.Id)</li>
+                                }
+                            </ul>
+                            <p class="text-danger"><em>Deleting this category will also remove these products.</em></p>
+                        }
+                        else
+                        {
+                            <span class="text-success">No products assigned</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const selectAll = document.getElementById('selectAllCheckbox');
+            const checkboxes = document.querySelectorAll('input[name="selectedIds"]');
+
+            selectAll.addEventListener('change', function () {
+                checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            });
+        });
+    </script>
+}

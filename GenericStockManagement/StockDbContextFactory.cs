@@ -8,8 +8,7 @@ public class StockDbContextFactory : IDesignTimeDbContextFactory<StockDbContext>
     {
         var optionsBuilder = new DbContextOptionsBuilder<StockDbContext>();
 
-        //  Local SQL Server connection string (adjust server name if needed)
-        optionsBuilder.UseSqlServer("Server=localhost;Database=StockDb;Trusted_Connection=True;TrustServerCertificate=True;");
+        optionsBuilder.UseSqlServer("Server=tcp:ci601stockdb.database.windows.net,1433;Initial Catalog=CI601StockDB;Persist Security Info=False;User ID=cs1657;Password=Pabfuv9b;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
 
         return new StockDbContext(optionsBuilder.Options);
     }

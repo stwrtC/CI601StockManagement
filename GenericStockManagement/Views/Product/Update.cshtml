@@ -1,0 +1,62 @@
+﻿@using GenericStockManagement.ViewModels
+@model ProductUpdateViewModel
+
+<h2>Update Products</h2>
+
+<form asp-action="ConfirmUpdate" method="post">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Brand</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Image URL</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Products.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <input type="hidden" name="updatedProducts[@i].Id" value="@Model.Products[i].Id" />
+                        @Model.Products[i].Id
+                    </td>
+                    <td>
+                        <input class="form-control" name="updatedProducts[@i].Name" value="@Model.Products[i].Name" />
+                    </td>
+                    <td>
+                        <select class="form-control" name="updatedProducts[@i].CategoryId">
+                            @foreach (var category in Model.Categories)
+                            {
+                                <option value="@category.Id" selected="@(category.Id == Model.Products[i].CategoryId)">
+                                    @category.Name
+                                </option>
+                            }
+                        </select>
+                    </td>
+                    <td>
+                        <input class="form-control" name="updatedProducts[@i].Brand" value="@Model.Products[i].Brand" />
+                    </td>
+                    <td>
+                        <input class="form-control" name="updatedProducts[@i].Description" value="@Model.Products[i].Description" />
+                    </td>
+                    <td>
+                        <input class="form-control" type="number" step="0.01" name="updatedProducts[@i].Price" value="@Model.Products[i].Price" />
+                    </td>
+                    <td>
+                        <input class="form-control" type="number" name="updatedProducts[@i].Quantity" value="@Model.Products[i].Quantity" />
+                    </td>
+                    <td>
+                        <input class="form-control" name="updatedProducts[@i].ImageThumbnail" value="@Model.Products[i].ImageThumbnail" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</form>

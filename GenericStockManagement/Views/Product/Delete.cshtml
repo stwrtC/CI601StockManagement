@@ -1,0 +1,60 @@
+﻿@using GenericStockManagement.ViewModels
+@model HomeViewModel
+
+<form asp-action="ConfirmDelete" method="post">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    <input class="form-check-input" type="checkbox" id="selectAllCheckbox">
+                </th>
+                <th>ID</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Brand</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Image</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model?._products?.Any() == true)
+            {
+                foreach (var product in Model._products)
+                {
+                    <tr>
+                        <td><input class="form-check-input" type="checkbox" name="selectedIds" value="@product.Id" /></td>
+                        <td>@product.Id</td>
+                        <td>@product.Name</td>
+                        <td>@Model._categories?.FirstOrDefault(x => x.Id == product.CategoryId)?.Name</td>
+                        <td>@product.Brand</td>
+                        <td>@product.Description</td>
+                        <td>@product.Price</td>
+                        <td>@product.Quantity</td>
+                        <td><img src="@product.ImageThumbnail" alt="Product Image" /></td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="9">No products available</td></tr>
+            }
+        </tbody>
+    </table>
+
+    <input type="submit" class="btn btn-danger" value="Delete Selected Products" />
+</form>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const selectAll = document.getElementById('selectAllCheckbox');
+            const checkboxes = document.querySelectorAll('input[name="selectedIds"]');
+
+            selectAll.addEventListener('change', function () {
+                checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            });
+        });
+    </script>
+}
