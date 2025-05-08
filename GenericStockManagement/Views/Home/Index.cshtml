@@ -7,162 +7,80 @@
 }
 
 <div class="text-center">
-	<h1 class="display-4">Products & Categories</h1>
+	<h1 class="display-4">Welcome</h1>
+    
+    <div class="chart-container">
+        <div class="chart-item">
+            <h4>Product Count by Category</h4>
+            <canvas id="productCountChart"></canvas>
+        </div>
 
-	<div>
-		<form asp-action="StockActions">
-			<div class="button-container">
-				@if (role == "Admin")
-				{
-					<div class="dropdown">
-						<a class="btn btn-secondary Stock-Actions" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							<span>
-								<img src="images/box-open.svg" alt="Alternate Text" />
-								<img src="images/angle-small-down.svg" alt="Alternate Text" />
-							</span>
-						</a>
-						<div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-							<button class="dropdown-item" type="submit" name="submitButton" value="Delete">Delete</button>
-							<button class="dropdown-item" type="submit" name="submitButton" value="Update">Update</button>
-						</div>
-					</div>
-				}
-				<span>
-					@if (role == "Admin" || role == "Contributor")
-					{
-						<a id="addStockBtn" class="btn btn-secondary Add-Stock" asp-controller="Product" asp-action="Create">
-							<img src="images/plus.svg" alt="Alternate Text" />
-						</a>
-					}
-				</span>
-			</div>
-			<table class="table">
-				<thead>
-					<tr>
-						<th>
-							<input class="form-check-input" type="checkbox" id="selectAllCheckbox">
-						</th>
-						<th>ID</th>
-						<th>Product Name</th>
-						<th>Category</th>
-						<th>Brand</th>
-						<th>Description</th>
-						<th>Price</th>
-						<th>Quantity</th>
-						<th>Image</th>
-					</tr>
-				</thead>
-				<tbody>
-					@{
-						if (Model?._products?.Any() == true)
-						{
-							foreach (var product in Model._products)
-							{
-								<tr>
-									<td> <input class="form-check-input" type="checkbox" id="flexCheckDefault" name="selectedIds" value="@product.Id"></td>
-									<td>@product.Id</td>
-									<td>@product.Name</td>
-									<td>@Model._categories?.FirstOrDefault(x => x.Id == product.CategoryId)?.Name</td>
-									<td>@product.Brand</td>
-									<td>@product.Description</td>
-									<td>@product.Price</td>
-									<td>@product.Quantity</td>
-									<td><img src="@product.ImageThumbnail" alt="Product Image" /></td>
-								</tr>
-							}
-						}
-						else
-						{
-							<tr>
-								<td colspan="6">No products available</td>
-							</tr>
-						}
-					}
+        <div class="chart-item">
+            <h4>Total Value by Category (£)</h4>
+            <canvas id="categoryValueChart"></canvas>
+        </div>
 
-				</tbody>
-			</table>
-		</form>
-	</div>
-	<br />
-	<form asp-action="CategoryActions">
-		<div class="button-container">
-			@if (role == "Admin")
-			{
-				<div class="dropdown">
-					<a class="btn btn-secondary Stock-Actions" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						<span>
-							<img src="images/box-open.svg" alt="Alternate Text" />
-							<img src="images/angle-small-down.svg" alt="Alternate Text" />
-						</span>
-					</a>
-					<div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-						<button class="dropdown-item" type="submit" name="submitButton" value="Delete">Delete</button>
-						<button class="dropdown-item" type="submit" name="submitButton" value="Update">Update</button>
-					</div>
-				</div>
-			}
-			<span>
-		@if (role == "Admin" || role == "Contributor")
-		{
-			<a id="addStockBtn" class="btn btn-secondary Add-Stock" asp-controller="Category" asp-action="Create">
-				<img src="images/plus.svg" alt="Alternate Text" />
-			</a>
-		}
-		</span>
-	</div>
-	<table class="table">
-		<thead>
-			<tr>
-				<th>
-					<input class="form-check-input" type="checkbox" id="selectAllCatCheckbox">
-				</th>
-				<th>Category Name</th>
-				<th>Description</th>
-			</tr>
-		</thead>
-		<tbody>
-			@{
-				if (Model._categories.Any())
-				{
-					foreach (var category in Model._categories)
-					{
-						<tr>
-							<td> <input class="form-check-input" type="checkbox" id="flexCheckDefault" name="selectedCatIds" value="@category.Id"></td>
-							<td>@category.Name</td>
-							<td>@category.Description</td>
-						</tr>
-					}
-				}
-				else
-				{
-					<tr>
-						<td colspan="3">No categories available</td>
-					</tr>
-				}
-			}
-		</tbody>
-	</table>
-	</form>
+        <div class="chart-item">
+            <h4>Stock by Category</h4>
+            <canvas id="categoryStockChart"></canvas>
+        </div>
+    </div>
+	
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-@section Scripts {
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			// Product Select All
-			const selectAll = document.getElementById('selectAllCheckbox');
-			const checkboxes = document.querySelectorAll('input[name="selectedIds"]');
-			selectAll.addEventListener('change', function () {
-				checkboxes.forEach(cb => cb.checked = selectAll.checked);
-			});
+<script>
+    var categoryCounts = @Html.Raw(ViewBag.CategoryCounts);
 
-			// Category Select All
-			const selectAllCat = document.getElementById('selectAllCatCheckbox');
-			const categoryCheckboxes = document.querySelectorAll('input[name="selectedCatIds"]');
-			selectAllCat.addEventListener('change', function () {
-				categoryCheckboxes.forEach(cb => cb.checked = selectAllCat.checked);
-			});
-		});
-	</script>
-}
+    // Product Count Pie Chart
+    var productCountChartCtx = document.getElementById('productCountChart').getContext('2d');
+    var productCountChart = new Chart(productCountChartCtx, {
+        type: 'pie',
+        data: {
+            labels: categoryCounts.map(item => item.CategoryName),
+            datasets: [{
+                label: 'Number of Products',
+                data: categoryCounts.map(item => item.ProductCount),
+                backgroundColor: categoryCounts.map(() => `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.5)`),
+                borderColor: categoryCounts.map(() => 'rgba(0, 0, 0, 0.1)'),
+                borderWidth: 1
+            }]
+        }
+    });
+
+    // Category Value Pie Chart
+    var categoryValueChartCtx = document.getElementById('categoryValueChart').getContext('2d');
+    var categoryValueChart = new Chart(categoryValueChartCtx, {
+        type: 'pie',
+        data: {
+            labels: categoryCounts.map(item => item.CategoryName),
+            datasets: [{
+                label: 'Total Category Value',
+                data: categoryCounts.map(item => item.TotalValue),
+                backgroundColor: categoryCounts.map(() => `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.5)`),
+                borderColor: categoryCounts.map(() => 'rgba(0, 0, 0, 0.1)'),
+                borderWidth: 1
+            }]
+        }
+    });
+
+    // Category Stock Pie Chart
+    var categoryStockChartCtx = document.getElementById('categoryStockChart').getContext('2d');
+    var categoryStockChart = new Chart(categoryStockChartCtx, {
+        type: 'pie',
+        data: {
+            labels: categoryCounts.map(item => item.CategoryName),
+            datasets: [{
+                label: 'Category Stock',
+                data: categoryCounts.map(item => item.TotalStock),
+                backgroundColor: categoryCounts.map(() => `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.5)`),
+                borderColor: categoryCounts.map(() => 'rgba(0, 0, 0, 0.1)'),
+                borderWidth: 1
+            }]
+        }
+    });
+</script>
+
+
 

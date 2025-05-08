@@ -16,8 +16,35 @@ namespace GenericStockManagement.Controllers
             _categoryRepository = categoryRepo;
         }
 
+        public IActionResult Index()
+        {
+            var products = _productRepository.GetAll();
+            var categories = _categoryRepository.GetAll();
+
+            var model = new HomeViewModel(products, categories);
+
+
+            return View(model);
+        }
+
+        public IActionResult StockActions(List<int> selectedIds, string submitButton)
+        {
+            if (submitButton == "Delete")
+            {
+                return RedirectToAction("Delete", "Product", new { ids = selectedIds });
+            }
+            else if (submitButton == "Update")
+            {
+                return RedirectToAction("Update", "Product", new { ids = selectedIds });
+            }
+            return RedirectToAction("Index");
+        }
         public IActionResult Create()
         {
+            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "Contributor")
+            {
+                return RedirectToAction("Login", "Account");
+            }
             ViewBag.Categories = _categoryRepository.GetAll();
             return View("Create", new Product());
         }
@@ -25,10 +52,14 @@ namespace GenericStockManagement.Controllers
         [HttpPost]
         public IActionResult Create(Product product)
         {
+            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "Contributor")
+            {
+                return RedirectToAction("Login", "Account");
+            }
             if (ModelState.IsValid)
             {
                 _productRepository.Add(product);
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Product");
 
             }
             ViewBag.Categories = _categoryRepository.GetAll();
@@ -37,6 +68,10 @@ namespace GenericStockManagement.Controllers
 
         public IActionResult Delete(List<int> ids)
         {
+            if (HttpContext.Session.GetString("Role") != "Admin")
+            {
+                return RedirectToAction("Login", "Account");
+            }
             var categories = _categoryRepository.GetAll();
             var products = new List<Product>();
             foreach (var id in ids)
@@ -50,15 +85,23 @@ namespace GenericStockManagement.Controllers
         [HttpPost]
         public IActionResult ConfirmDelete(List<int> selectedIds)
         {
+            if (HttpContext.Session.GetString("Role") != "Admin")
+            {
+                return RedirectToAction("Login", "Account");
+            }
             foreach (var id in selectedIds)
             {
                 _productRepository.Delete(id);
             }
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Product");
         }
 
         public IActionResult Update(List<int> ids)
         {
+            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "Contributor")
+            {
+                return RedirectToAction("Login", "Account");
+            }
             var categories = _categoryRepository.GetAll();
             var products = ids
                 .Select(id => _productRepository.GetById(id))
@@ -87,6 +130,10 @@ namespace GenericStockManagement.Controllers
         [HttpPost]
         public IActionResult ConfirmUpdate(List<ProductEditViewModel> updatedProducts)
         {
+            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "Contributor")
+            {
+                return RedirectToAction("Login", "Account");
+            }
             foreach (var vm in updatedProducts)
             {
                 var product = _productRepository.GetById(vm.Id);
@@ -104,7 +151,7 @@ namespace GenericStockManagement.Controllers
                 }
             }
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Product");
         }
     }
 }

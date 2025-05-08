@@ -3,6 +3,7 @@ using GenericStockManagement.Models;
 using GenericStockManagement.Repositories;
 using GenericStockManagement.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace GenericStockManagement.Controllers
 {
@@ -24,10 +25,17 @@ namespace GenericStockManagement.Controllers
             var products = _productRepository.GetAll();
             var categories = _categoryRepository.GetAll();
 
-            var model = new HomeViewModel(products, categories);
+            var categoryCounts = categories.Select(category => new
+            {
+                CategoryName = category.Name,
+                ProductCount = products.Count(p => p.CategoryId == category.Id),
+                TotalValue = products.Where(p => p.CategoryId == category.Id).Sum(p => p.Price * p.Quantity),
+                TotalStock = products.Where(p => p.CategoryId == category.Id).Sum(p => p.Quantity)
+            }).ToList();
 
+            ViewBag.CategoryCounts = JsonConvert.SerializeObject(categoryCounts);
 
-            return View(model);
+            return View();
         }
 
         public IActionResult Privacy()
@@ -41,30 +49,6 @@ namespace GenericStockManagement.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public IActionResult StockActions(List<int> selectedIds, string submitButton)
-        {
-            if (submitButton == "Delete")
-            {
-                return RedirectToAction("Delete", "Product", new { ids = selectedIds});
-            }
-            else if (submitButton == "Update")
-            {
-                return RedirectToAction("Update", "Product", new { ids = selectedIds});
-            }
-            return RedirectToAction("Index");
-        }
-        public IActionResult CategoryActions(List<int> selectedCatIds, string submitButton)
-        {
-            if (submitButton == "Delete")
-            {
-                return RedirectToAction("Delete", "Category", new { ids = selectedCatIds });
-            }
-            else if (submitButton == "Update")
-            {
-                return RedirectToAction("Update", "Category", new { ids = selectedCatIds });
-            }
-            return RedirectToAction("Index");
-        }
 
     }
 }

@@ -1,0 +1,99 @@
+﻿@using GenericStockManagement.ViewModels
+@model HomeViewModel
+
+@{
+	ViewData["Title"] = "Home Page";
+	var role = Context.Session.GetString("Role");
+}
+<div class="text-center">
+	<h1 class="display-4">Products</h1>
+
+	<div>
+		<form asp-action="StockActions">
+			<div class="button-container">
+					<div class="dropdown">
+						<a class="btn btn-secondary Stock-Actions" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<span>
+								<img src="images/box-open.svg" alt="Alternate Text" />
+								<img src="images/angle-small-down.svg" alt="Alternate Text" />
+							</span>
+						</a>
+						<div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+							@if (role == "Admin"){
+								<button class="dropdown-item" type="submit" name="submitButton" value="Delete">Delete</button>
+							}
+							@if (role == "Admin" || role == "Contributor"){
+								<button class="dropdown-item" type="submit" name="submitButton" value="Update">Update</button>
+							}
+						</div>
+					</div>
+				<span>
+					@if (role == "Admin" || role == "Contributor")
+					{
+						<a id="addStockBtn" class="btn btn-secondary Add-Stock" asp-controller="Product" asp-action="Create">
+							<img src="images/plus.svg" alt="Alternate Text" />
+						</a>
+					}
+				</span>
+			</div>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>
+							<input class="form-check-input" type="checkbox" id="selectAllCheckbox">
+						</th>
+						<th>ID</th>
+						<th>Product Name</th>
+						<th>Category</th>
+						<th>Brand</th>
+						<th>Description</th>
+						<th>Price</th>
+						<th>Quantity</th>
+						<th>Image</th>
+					</tr>
+				</thead>
+				<tbody>
+					@{
+						if (Model?._products?.Any() == true)
+						{
+							foreach (var product in Model._products)
+							{
+								<tr>
+									<td> <input class="form-check-input" type="checkbox" id="flexCheckDefault" name="selectedIds" value="@product.Id"></td>
+									<td>@product.Id</td>
+									<td>@product.Name</td>
+									<td>@Model._categories?.FirstOrDefault(x => x.Id == product.CategoryId)?.Name</td>
+									<td>@product.Brand</td>
+									<td>@product.Description</td>
+									<td>@product.Price</td>
+									<td>@product.Quantity</td>
+									<td><img src="@product.ImageThumbnail" alt="Product Image" /></td>
+								</tr>
+							}
+						}
+						else
+						{
+							<tr>
+								<td colspan="6">No products available</td>
+							</tr>
+						}
+					}
+
+				</tbody>
+			</table>
+		</form>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const selectAll = document.getElementById('selectAllCheckbox');
+			const checkboxes = document.querySelectorAll('input[name="selectedIds"]');
+			selectAll.addEventListener('change', function () {
+				checkboxes.forEach(cb => cb.checked = selectAll.checked);
+			});
+
+		});
+	</script>
+}

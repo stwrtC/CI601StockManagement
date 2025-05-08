@@ -1,0 +1,88 @@
+﻿@using GenericStockManagement.ViewModels
+@model HomeViewModel
+
+@{
+	ViewData["Title"] = "Home Page";
+	var role = Context.Session.GetString("Role");
+}
+
+<div class="text-center">
+	<h1 class="display-4">Categories</h1>
+	<form asp-action="CategoryActions">
+	<div class="button-container">
+			<div class="dropdown">
+				<a class="btn btn-secondary Stock-Actions" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span>
+						<img src="images/box-open.svg" alt="Alternate Text" />
+						<img src="images/angle-small-down.svg" alt="Alternate Text" />
+					</span>
+				</a>
+				<div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+						@if (role == "Admin"){
+							<button class="dropdown-item" type="submit" name="submitButton" value="Delete">Delete</button>
+						}
+						@if (role == "Admin" || role == "Contributor"){
+							<button class="dropdown-item" type="submit" name="submitButton" value="Update">Update</button>
+						}
+				</div>
+			</div>
+		
+		<span>
+			@if (role == "Admin" || role == "Contributor")
+			{
+				<a id="addStockBtn" class="btn btn-secondary Add-Stock" asp-controller="Category" asp-action="Create">
+					<img src="images/plus.svg" alt="Alternate Text" />
+				</a>
+			}
+		</span>
+	</div>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>
+					<input class="form-check-input" type="checkbox" id="selectAllCatCheckbox">
+				</th>
+				<th>Category Name</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			@{
+				if (Model._categories.Any())
+				{
+					foreach (var category in Model._categories)
+					{
+						<tr>
+							<td> <input class="form-check-input" type="checkbox" id="flexCheckDefault" name="selectedCatIds" value="@category.Id"></td>
+							<td>@category.Name</td>
+							<td>@category.Description</td>
+						</tr>
+					}
+				}
+				else
+				{
+					<tr>
+						<td colspan="3">No categories available</td>
+					</tr>
+				}
+			}
+		</tbody>
+	</table>
+</form>
+</div>
+
+
+@section Scripts {
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+
+			// Category Select All
+			const selectAllCat = document.getElementById('selectAllCatCheckbox');
+			const categoryCheckboxes = document.querySelectorAll('input[name="selectedCatIds"]');
+			selectAllCat.addEventListener('change', function () {
+				categoryCheckboxes.forEach(cb => cb.checked = selectAllCat.checked);
+			});
+		});
+	</script>
+}
+

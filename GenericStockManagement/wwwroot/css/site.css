@@ -21,15 +21,13 @@ body {
   margin-bottom: 60px;
 }
 
-/* Parent div to align content to the left */
 .button-container {
     display: flex;
-    justify-content: flex-start; /* Aligns content to the left */
-    gap: 8px; /* Optional spacing between buttons */
+    justify-content: flex-start; 
+    gap: 8px; 
 }
 
 
-/* Button styles */
 .Stock-Actions,
 .Add-Stock {
     padding: 4px 8px;
@@ -43,17 +41,35 @@ body {
     gap: 4px;
 }
 
-    /* Image wrapper inside Stock-Actions */
     .Stock-Actions span {
         display: inline-flex;
         align-items: center;
         gap: 4px;
     }
 
-    /* Icon styles */
     .Stock-Actions img,
     .Add-Stock img {
         width: 16px;
         height: 16px;
         vertical-align: middle;
+    }
+
+.chart-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 20px; 
+}
+
+.chart-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+    .chart-item h4 {
+        text-align: center; 
+        margin-bottom: 10px; 
+        font-size: 1.25rem; 
+        font-weight: bold; 
     }
