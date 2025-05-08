@@ -9,11 +9,13 @@ namespace GenericStockManagement.Controllers
     {
         public readonly IRepository<Product> _productRepository;
         public readonly IRepository<Category> _categoryRepository;
+        private readonly ISessionService _sessionService;
 
-        public ProductController(IRepository<Product> productRepo, IRepository<Category> categoryRepo)
+        public ProductController(IRepository<Product> productRepo, IRepository<Category> categoryRepo, ISessionService sessionService)
         {
             _productRepository = productRepo;
             _categoryRepository = categoryRepo;
+            _sessionService = sessionService;
         }
 
         public IActionResult Index()
@@ -41,7 +43,7 @@ namespace GenericStockManagement.Controllers
         }
         public IActionResult Create()
         {
-            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "Contributor")
+            if (_sessionService.GetRole() != "Admin" && _sessionService.GetRole() != "Contributor")
             {
                 return RedirectToAction("Login", "Account");
             }
@@ -52,7 +54,7 @@ namespace GenericStockManagement.Controllers
         [HttpPost]
         public IActionResult Create(Product product)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "Contributor")
+            if (_sessionService.GetRole() != "Admin" && _sessionService.GetRole() != "Contributor")
             {
                 return RedirectToAction("Login", "Account");
             }
@@ -68,7 +70,7 @@ namespace GenericStockManagement.Controllers
 
         public IActionResult Delete(List<int> ids)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
+            if (_sessionService.GetRole() != "Admin")
             {
                 return RedirectToAction("Login", "Account");
             }
@@ -85,7 +87,7 @@ namespace GenericStockManagement.Controllers
         [HttpPost]
         public IActionResult ConfirmDelete(List<int> selectedIds)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
+            if (_sessionService.GetRole() != "Admin")
             {
                 return RedirectToAction("Login", "Account");
             }
@@ -98,7 +100,7 @@ namespace GenericStockManagement.Controllers
 
         public IActionResult Update(List<int> ids)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "Contributor")
+            if (_sessionService.GetRole() != "Admin" && _sessionService.GetRole() != "Contributor")
             {
                 return RedirectToAction("Login", "Account");
             }
@@ -130,7 +132,7 @@ namespace GenericStockManagement.Controllers
         [HttpPost]
         public IActionResult ConfirmUpdate(List<ProductEditViewModel> updatedProducts)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "Contributor")
+            if (_sessionService.GetRole() != "Admin" && _sessionService.GetRole() != "Contributor")
             {
                 return RedirectToAction("Login", "Account");
             }

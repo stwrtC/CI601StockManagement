@@ -13,8 +13,8 @@ internal class Program
         // Add services to the container.
         builder.Services.AddControllersWithViews();
 
-        // Register session services
-        builder.Services.AddDistributedMemoryCache(); // Needed for session state
+        // Register session and required services
+        builder.Services.AddDistributedMemoryCache();
         builder.Services.AddSession(options =>
         {
             options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -22,6 +22,9 @@ internal class Program
             options.Cookie.IsEssential = true;
         });
 
+        builder.Services.AddHttpContextAccessor(); // <-- ADD THIS LINE
+
+        builder.Services.AddScoped<ISessionService, SessionService>();
         builder.Services.AddScoped<IRepository<Product>, ProductRepository>();
         builder.Services.AddScoped<IRepository<Category>, CategoryRepository>();
 
@@ -42,7 +45,7 @@ internal class Program
 
         app.UseRouting();
 
-        app.UseSession();         // <-- Add this before UseAuthorization
+        app.UseSession();
         app.UseAuthorization();
 
         app.MapControllerRoute(

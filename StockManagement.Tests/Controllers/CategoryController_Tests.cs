@@ -1,4 +1,5 @@
-﻿using GenericStockManagement.Controllers;
+﻿using GenericStockManagement;
+using GenericStockManagement.Controllers;
 using GenericStockManagement.Models;
 using GenericStockManagement.Repositories;
 using GenericStockManagement.ViewModels;
@@ -14,19 +15,23 @@ namespace StockManagement.Tests.Controllers
     {
         private static Mock<IRepository<Category>> catRepository;
         private static Mock<IRepository<Product>> proRepository;
+        private static Mock<ISessionService> sessionServiceMock;
 
         [SetUp]
         public void Setup()
         {
             catRepository = new Mock<IRepository<Category>>();
             proRepository = new Mock<IRepository<Product>>();
+            sessionServiceMock = new Mock<ISessionService>();
         }
 
         [Test]
         public void Create_Post_ValidModel_AddsCategoryAndRedirects()
         {
-            var controller = new CategoryController(catRepository.Object, proRepository.Object);
-            var category = new Category { Id = 1, Name = "Test", Description = "Test Desc" };
+            sessionServiceMock.Setup(s => s.GetRole()).Returns("Admin");
+            var controller = new CategoryController(catRepository.Object, proRepository.Object, sessionServiceMock.Object);
+
+            var category = new Category { Name = "Test", Description = "Test Desc" };
 
             var result = controller.Create(category);
 
@@ -34,21 +39,22 @@ namespace StockManagement.Tests.Controllers
             Assert.That(result, Is.TypeOf<RedirectToActionResult>());
             var redirect = result as RedirectToActionResult;
             Assert.That(redirect.ActionName, Is.EqualTo("Index"));
-            Assert.That(redirect.ControllerName, Is.EqualTo("Home"));
+            Assert.That(redirect.ControllerName, Is.EqualTo("Category"));
         }
 
         [Test]
         public void Delete_WithValidIds_ReturnsViewWithCategoryProducts()
         {
+            sessionServiceMock.Setup(s => s.GetRole()).Returns("Admin");
             var category = new Category { Id = 1, Name = "Cat1" };
             var products = new List<Product> {
-                new Product { Id = 1, Name = "P1", CategoryId = 1 }
+                new Product { Name = "P1", CategoryId = 1 }
             };
 
             catRepository.Setup(r => r.GetById(1)).Returns(category);
             proRepository.Setup(r => r.GetAll()).Returns(products);
 
-            var controller = new CategoryController(catRepository.Object, proRepository.Object);
+            var controller = new CategoryController(catRepository.Object, proRepository.Object, sessionServiceMock.Object);
 
             var result = controller.Delete(new List<int> { 1 });
 
@@ -63,7 +69,9 @@ namespace StockManagement.Tests.Controllers
         [Test]
         public void ConfirmDelete_DeletesEachCategoryAndRedirects()
         {
-            var controller = new CategoryController(catRepository.Object, proRepository.Object);
+            sessionServiceMock.Setup(s => s.GetRole()).Returns("Admin");
+
+            var controller = new CategoryController(catRepository.Object, proRepository.Object, sessionServiceMock.Object);
 
             var result = controller.ConfirmDelete(new List<int> { 1 });
 
@@ -71,16 +79,18 @@ namespace StockManagement.Tests.Controllers
             Assert.That(result, Is.TypeOf<RedirectToActionResult>());
             var redirect = result as RedirectToActionResult;
             Assert.That(redirect.ActionName, Is.EqualTo("Index"));
-            Assert.That(redirect.ControllerName, Is.EqualTo("Home"));
+            Assert.That(redirect.ControllerName, Is.EqualTo("Category"));
         }
 
         [Test]
         public void Update_WithValidIds_ReturnsCategoriesInViewModel()
         {
+            sessionServiceMock.Setup(s => s.GetRole()).Returns("Admin");
+
             var category = new Category { Id = 1, Name = "Cat1" };
             catRepository.Setup(r => r.GetById(1)).Returns(category);
 
-            var controller = new CategoryController(catRepository.Object, proRepository.Object);
+            var controller = new CategoryController(catRepository.Object, proRepository.Object, sessionServiceMock.Object);
 
             var result = controller.Update(new List<int> { 1 });
 
@@ -95,8 +105,11 @@ namespace StockManagement.Tests.Controllers
         [Test]
         public void ConfirmUpdate_UpdatesEachCategoryAndRedirects()
         {
-            var controller = new CategoryController(catRepository.Object, proRepository.Object);
-            var updatedCategory = new Category { Id = 1, Name = "Updated", Description = "Updated Desc" };
+            sessionServiceMock.Setup(s => s.GetRole()).Returns("Admin");
+
+            var controller = new CategoryController(catRepository.Object, proRepository.Object, sessionServiceMock.Object);
+
+            var updatedCategory = new Category { Name = "Updated", Description = "Updated Desc" };
 
             var result = controller.ConfirmUpdate(new List<Category> { updatedCategory });
 
@@ -104,7 +117,7 @@ namespace StockManagement.Tests.Controllers
             Assert.That(result, Is.TypeOf<RedirectToActionResult>());
             var redirect = result as RedirectToActionResult;
             Assert.That(redirect.ActionName, Is.EqualTo("Index"));
-            Assert.That(redirect.ControllerName, Is.EqualTo("Home"));
+            Assert.That(redirect.ControllerName, Is.EqualTo("Category"));
         }
     }
 }

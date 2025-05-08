@@ -1,4 +1,5 @@
-﻿using GenericStockManagement.Controllers;
+﻿using GenericStockManagement;
+using GenericStockManagement.Controllers;
 using GenericStockManagement.Models;
 using GenericStockManagement.Repositories;
 using GenericStockManagement.ViewModels;
@@ -15,19 +16,23 @@ namespace StockManagement.Tests.Controllers
     public class ProductController_Tests
     {
 
-        private static Mock<IRepository<Product>> proRepository;
         private static Mock<IRepository<Category>> catRepository;
+        private static Mock<IRepository<Product>> proRepository;
+        private static Mock<ISessionService> sessionServiceMock;
+
         [SetUp]
         public void Setup()
         {
-            proRepository = new Mock<IRepository<Product>>();
             catRepository = new Mock<IRepository<Category>>();
+            proRepository = new Mock<IRepository<Product>>();
+            sessionServiceMock = new Mock<ISessionService>();
         }
 
         [Test]
         public void Create()
         {
-            var controller = new ProductController(proRepository.Object, null);
+            sessionServiceMock.Setup(s => s.GetRole()).Returns("Admin");
+            var controller = new ProductController(proRepository.Object, null, sessionServiceMock.Object);
             var product = new Product
             {
                 Id = 1,
@@ -51,6 +56,7 @@ namespace StockManagement.Tests.Controllers
         [Test]
         public void Delete_WithValidIds_ReturnsViewWithModel()
         {
+            sessionServiceMock.Setup(s => s.GetRole()).Returns("Admin");
             var product = new Product
             {
                 Id = 1,
@@ -68,7 +74,7 @@ namespace StockManagement.Tests.Controllers
             proRepository.Setup(x => x.GetById(product.Id)).Returns(product);
             catRepository.Setup(x => x.GetAll()).Returns(new List<Category> { category });
 
-            var controller = new ProductController(proRepository.Object, catRepository.Object);
+            var controller = new ProductController(proRepository.Object, catRepository.Object, sessionServiceMock.Object);
 
             var result = controller.Delete(new List<int> { product.Id });
 
@@ -82,7 +88,8 @@ namespace StockManagement.Tests.Controllers
         [Test]
         public void ConfirmDelete_WithValidIds_DeletesProductsAndRedirects()
         {
-            var controller = new ProductController(proRepository.Object, null);
+            sessionServiceMock.Setup(s => s.GetRole()).Returns("Admin");
+            var controller = new ProductController(proRepository.Object, null, sessionServiceMock.Object);
 
             var productId = 1;
 
@@ -92,12 +99,13 @@ namespace StockManagement.Tests.Controllers
             Assert.That(result, Is.TypeOf<RedirectToActionResult>());
             var redirectResult = result as RedirectToActionResult;
             Assert.That(redirectResult.ActionName, Is.EqualTo("Index"));
-            Assert.That(redirectResult.ControllerName, Is.EqualTo("Home"));
+            Assert.That(redirectResult.ControllerName, Is.EqualTo("Product"));
         }
 
         [Test]
         public void Update_WithValidIds_ReturnsViewWithProductsAndCategories()
         {
+            sessionServiceMock.Setup(s => s.GetRole()).Returns("Admin");
             var productId = 1;
             var product = new Product
             {
@@ -116,7 +124,7 @@ namespace StockManagement.Tests.Controllers
             proRepository.Setup(r => r.GetById(productId)).Returns(product);
             catRepository.Setup(r => r.GetAll()).Returns(new List<Category> { category });
 
-            var controller = new ProductController(proRepository.Object, catRepository.Object);
+            var controller = new ProductController(proRepository.Object, catRepository.Object, sessionServiceMock.Object);
 
             var result = controller.Update(new List<int> { productId });
 
@@ -132,6 +140,7 @@ namespace StockManagement.Tests.Controllers
         [Test]
         public void ConfirmUpdate_ValidProducts_UpdatesRepositoryAndRedirects()
         {
+            sessionServiceMock.Setup(s => s.GetRole()).Returns("Admin");
             var productId = 1;
             var originalProduct = new Product
             {
@@ -159,7 +168,7 @@ namespace StockManagement.Tests.Controllers
 
             proRepository.Setup(r => r.GetById(productId)).Returns(originalProduct);
 
-            var controller = new ProductController(proRepository.Object, catRepository.Object);
+            var controller = new ProductController(proRepository.Object, catRepository.Object, sessionServiceMock.Object);
 
             var result = controller.ConfirmUpdate(new List<ProductEditViewModel> { updatedProduct });
 
@@ -177,7 +186,7 @@ namespace StockManagement.Tests.Controllers
             Assert.That(result, Is.TypeOf<RedirectToActionResult>());
             var redirect = result as RedirectToActionResult;
             Assert.That(redirect?.ActionName, Is.EqualTo("Index"));
-            Assert.That(redirect?.ControllerName, Is.EqualTo("Home"));
+            Assert.That(redirect?.ControllerName, Is.EqualTo("Product"));
         }
 
     }
