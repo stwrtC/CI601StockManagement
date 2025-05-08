@@ -95,9 +95,90 @@ namespace StockManagement.Tests.Controllers
             Assert.That(redirectResult.ControllerName, Is.EqualTo("Home"));
         }
 
+        [Test]
+        public void Update_WithValidIds_ReturnsViewWithProductsAndCategories()
+        {
+            var productId = 1;
+            var product = new Product
+            {
+                Id = productId,
+                Name = "Updated Product",
+                Brand = "Brand",
+                Description = "Description",
+                ImageThumbnail = "image.jpg",
+                Quantity = 5,
+                Price = 100,
+                CategoryId = 2
+            };
 
+            var category = new Category { Id = 2, Name = "Category 2" };
 
+            proRepository.Setup(r => r.GetById(productId)).Returns(product);
+            catRepository.Setup(r => r.GetAll()).Returns(new List<Category> { category });
 
+            var controller = new ProductController(proRepository.Object, catRepository.Object);
+
+            var result = controller.Update(new List<int> { productId });
+
+            Assert.That(result, Is.TypeOf<ViewResult>());
+            var viewResult = result as ViewResult;
+            var model = viewResult?.Model as ProductUpdateViewModel;
+            Assert.IsNotNull(model);
+            Assert.That(model.Products.Count, Is.EqualTo(1));
+            Assert.That(model.Categories.Count(), Is.EqualTo(1));
+            Assert.That(model.Products[0].Name, Is.EqualTo("Updated Product"));
+        }
+
+        [Test]
+        public void ConfirmUpdate_ValidProducts_UpdatesRepositoryAndRedirects()
+        {
+            var productId = 1;
+            var originalProduct = new Product
+            {
+                Id = productId,
+                Name = "Old Name",
+                CategoryId = 1,
+                Brand = "Old Brand",
+                Description = "Old Desc",
+                Price = 10,
+                Quantity = 1,
+                ImageThumbnail = "old.jpg"
+            };
+
+            var updatedProduct = new ProductEditViewModel
+            {
+                Id = productId,
+                Name = "New Name",
+                CategoryId = 2,
+                Brand = "New Brand",
+                Description = "New Desc",
+                Price = 99.99m,
+                Quantity = 10,
+                ImageThumbnail = "new.jpg"
+            };
+
+            proRepository.Setup(r => r.GetById(productId)).Returns(originalProduct);
+
+            var controller = new ProductController(proRepository.Object, catRepository.Object);
+
+            var result = controller.ConfirmUpdate(new List<ProductEditViewModel> { updatedProduct });
+
+            proRepository.Verify(r => r.Update(It.Is<Product>(p =>
+                p.Id == productId &&
+                p.Name == "New Name" &&
+                p.CategoryId == 2 &&
+                p.Brand == "New Brand" &&
+                p.Description == "New Desc" &&
+                p.Price == 99.99m &&
+                p.Quantity == 10 &&
+                p.ImageThumbnail == "new.jpg"
+            )), Times.Once);
+
+            Assert.That(result, Is.TypeOf<RedirectToActionResult>());
+            var redirect = result as RedirectToActionResult;
+            Assert.That(redirect?.ActionName, Is.EqualTo("Index"));
+            Assert.That(redirect?.ControllerName, Is.EqualTo("Home"));
+        }
 
     }
 }

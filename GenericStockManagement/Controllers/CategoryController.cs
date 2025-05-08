@@ -24,7 +24,7 @@ namespace GenericStockManagement.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult<Category> Create(Category entity)
+        public IActionResult Create(Category entity)
         {
             var newCategory = new Category()
             {

@@ -27,6 +27,15 @@
                         </li>
                     </ul>
                 </div>
+                @if (Context.Session.GetString("Username") != null)
+                {
+                    <p>Welcome, @Context.Session.GetString("Username") (@Context.Session.GetString("Role"))</p>
+                    <a asp-controller="Login" asp-action="Logout">Logout</a>
+                }
+                else
+                {
+                    <a asp-controller="Login" asp-action="Index">Login</a>
+                }
             </div>
         </nav>
     </header>

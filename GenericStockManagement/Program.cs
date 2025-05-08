@@ -1,10 +1,8 @@
 using GenericStockManagement;
 using GenericStockManagement.Models;
 using GenericStockManagement.Repositories;
-using System.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-
 
 internal class Program
 {
@@ -12,8 +10,17 @@ internal class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.  
+        // Add services to the container.
         builder.Services.AddControllersWithViews();
+
+        // Register session services
+        builder.Services.AddDistributedMemoryCache(); // Needed for session state
+        builder.Services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromMinutes(30);
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+        });
 
         builder.Services.AddScoped<IRepository<Product>, ProductRepository>();
         builder.Services.AddScoped<IRepository<Category>, CategoryRepository>();
@@ -23,11 +30,10 @@ internal class Program
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.  
+        // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Home/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.  
             app.UseHsts();
         }
 
@@ -36,6 +42,7 @@ internal class Program
 
         app.UseRouting();
 
+        app.UseSession();         // <-- Add this before UseAuthorization
         app.UseAuthorization();
 
         app.MapControllerRoute(

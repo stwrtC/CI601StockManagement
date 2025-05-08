@@ -3,6 +3,7 @@
 
 @{
 	ViewData["Title"] = "Home Page";
+	var role = Context.Session.GetString("Role");
 }
 
 <div class="text-center">
@@ -11,23 +12,28 @@
 	<div>
 		<form asp-action="StockActions">
 			<div class="button-container">
-				<div class="dropdown">
-					<a class="btn btn-secondary Stock-Actions" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						<span>
-							<img src="images/box-open.svg" alt="Alternate Text" />
-							<img src="images/angle-small-down.svg" alt="Alternate Text" />
-						</span>
-					</a>
-					<div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-						<button class="dropdown-item" type="submit" name="submitButton" value="Delete">Delete</button>
-						<button class="dropdown-item" type="submit" name="submitButton" value="Update">Update</button>
-						<button class="dropdown-item" type="submit" name="submitButton" value="Other">Other</button>
+				@if (role == "Admin")
+				{
+					<div class="dropdown">
+						<a class="btn btn-secondary Stock-Actions" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<span>
+								<img src="images/box-open.svg" alt="Alternate Text" />
+								<img src="images/angle-small-down.svg" alt="Alternate Text" />
+							</span>
+						</a>
+						<div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+							<button class="dropdown-item" type="submit" name="submitButton" value="Delete">Delete</button>
+							<button class="dropdown-item" type="submit" name="submitButton" value="Update">Update</button>
+						</div>
 					</div>
-				</div>
+				}
 				<span>
-					<a id="addStockBtn" class="btn btn-secondary Add-Stock" asp-controller="Product" asp-action="Create">
-						<img src="images/plus.svg" alt="Alternate Text" />
-					</a>
+					@if (role == "Admin" || role == "Contributor")
+					{
+						<a id="addStockBtn" class="btn btn-secondary Add-Stock" asp-controller="Product" asp-action="Create">
+							<img src="images/plus.svg" alt="Alternate Text" />
+						</a>
+					}
 				</span>
 			</div>
 			<table class="table">
@@ -79,24 +85,29 @@
 	</div>
 	<br />
 	<form asp-action="CategoryActions">
-	<div class="button-container">
-		<div class="dropdown">
-			<a class="btn btn-secondary Stock-Actions" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				<span>
-					<img src="images/box-open.svg" alt="Alternate Text" />
-					<img src="images/angle-small-down.svg" alt="Alternate Text" />
-				</span>
-			</a>
-			<div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-				<button class="dropdown-item" type="submit" name="submitButton" value="Delete">Delete</button>
-				<button class="dropdown-item" type="submit" name="submitButton" value="Update">Update</button>
-				<button class="dropdown-item" type="submit" name="submitButton" value="Other">Other</button>
-			</div>
-		</div>
-		<span>
+		<div class="button-container">
+			@if (role == "Admin")
+			{
+				<div class="dropdown">
+					<a class="btn btn-secondary Stock-Actions" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<span>
+							<img src="images/box-open.svg" alt="Alternate Text" />
+							<img src="images/angle-small-down.svg" alt="Alternate Text" />
+						</span>
+					</a>
+					<div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+						<button class="dropdown-item" type="submit" name="submitButton" value="Delete">Delete</button>
+						<button class="dropdown-item" type="submit" name="submitButton" value="Update">Update</button>
+					</div>
+				</div>
+			}
+			<span>
+		@if (role == "Admin" || role == "Contributor")
+		{
 			<a id="addStockBtn" class="btn btn-secondary Add-Stock" asp-controller="Category" asp-action="Create">
 				<img src="images/plus.svg" alt="Alternate Text" />
 			</a>
+		}
 		</span>
 	</div>
 	<table class="table">
