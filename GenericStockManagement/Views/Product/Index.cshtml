@@ -11,6 +11,9 @@
 	<div>
 		<form asp-action="StockActions">
 			<div class="button-container">
+				@if (role == "Admin" || role == "Contributor")
+				{
+
 					<div class="dropdown">
 						<a class="btn btn-secondary Stock-Actions" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							<span>
@@ -19,14 +22,17 @@
 							</span>
 						</a>
 						<div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-							@if (role == "Admin"){
+							@if (role == "Admin")
+							{
 								<button class="dropdown-item" type="submit" name="submitButton" value="Delete">Delete</button>
 							}
-							@if (role == "Admin" || role == "Contributor"){
+							@if (role == "Admin" || role == "Contributor")
+							{
 								<button class="dropdown-item" type="submit" name="submitButton" value="Update">Update</button>
 							}
 						</div>
 					</div>
+				}
 				<span>
 					@if (role == "Admin" || role == "Contributor")
 					{

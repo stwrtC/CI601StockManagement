@@ -9,24 +9,28 @@
 <div class="text-center">
 	<h1 class="display-4">Categories</h1>
 	<form asp-action="CategoryActions">
-	<div class="button-container">
-			<div class="dropdown">
-				<a class="btn btn-secondary Stock-Actions" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<span>
-						<img src="images/box-open.svg" alt="Alternate Text" />
-						<img src="images/angle-small-down.svg" alt="Alternate Text" />
-					</span>
-				</a>
-				<div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-						@if (role == "Admin"){
+		<div class="button-container">
+			@if (role == "Admin" || role == "Contributor")
+			{
+				<div class="dropdown">
+					<a class="btn btn-secondary Stock-Actions" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<span>
+							<img src="images/box-open.svg" alt="Alternate Text" />
+							<img src="images/angle-small-down.svg" alt="Alternate Text" />
+						</span>
+					</a>
+					<div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+						@if (role == "Admin")
+						{
 							<button class="dropdown-item" type="submit" name="submitButton" value="Delete">Delete</button>
 						}
-						@if (role == "Admin" || role == "Contributor"){
+						@if (role == "Admin" || role == "Contributor")
+						{
 							<button class="dropdown-item" type="submit" name="submitButton" value="Update">Update</button>
 						}
-				</div>
+					</div>
 			</div>
-		
+			}
 		<span>
 			@if (role == "Admin" || role == "Contributor")
 			{
