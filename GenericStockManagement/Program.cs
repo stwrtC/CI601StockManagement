@@ -22,7 +22,7 @@ internal class Program
             options.Cookie.IsEssential = true;
         });
 
-        builder.Services.AddHttpContextAccessor(); // <-- ADD THIS LINE
+        builder.Services.AddHttpContextAccessor(); 
 
         builder.Services.AddScoped<ISessionService, SessionService>();
         builder.Services.AddScoped<IRepository<Product>, ProductRepository>();
