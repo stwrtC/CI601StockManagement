@@ -2,11 +2,9 @@
 
 
 trigger:
-  branches:
-    include:
-      - develop
-      -staging
-      - main
+  - develop
+  - staging
+  - main
 
 pool:
   vmImage: 'windows-latest'
