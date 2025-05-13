@@ -43,6 +43,8 @@ steps:
         --out odc-report \
         --format HTML \
         --data odc-data
+        --nvdApiKey $(NVD_API_KEY)
+        --enableExperimental
 
 # Publish Dependency-Check report
 - task: PublishBuildArtifacts@1
