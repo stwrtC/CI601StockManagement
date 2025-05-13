@@ -37,6 +37,11 @@ steps:
   inputs:
     testResultsFormat: 'NUnit'
     testResultsFiles: '**/TEST-*.xml'
+
+- task: MicrosoftSecurityDevOps@1
+  displayName: 'Run Microsoft Security Analysis'
+  inputs:
+    command: 'run'
 # Build and test ASP.NET projects.
 # Add steps that publish symbols, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
