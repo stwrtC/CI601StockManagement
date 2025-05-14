@@ -45,6 +45,8 @@ steps:
         --data odc-data \
         --nvdApiKey $(NVD_API_KEY) \
         --enableExperimental
+  env:
+    NVD_API_KEY: $(NVD_API_KEY)
 
 # Publish Dependency-Check report
 - task: PublishBuildArtifacts@1
