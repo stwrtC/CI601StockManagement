@@ -20,8 +20,8 @@ steps:
 - checkout: self
 
 # Run Microsoft Security DevOps
-- task: MicrosoftSecurityDevOps@1
-  displayName: 'Run Microsoft Security DevOps Analysis'
+#- task: MicrosoftSecurityDevOps@1
+ # displayName: 'Run Microsoft Security DevOps Analysis'
 
 # Run OWASP Dependency-Check
 - task: UseDotNet@2
@@ -42,8 +42,8 @@ steps:
         --scan . \
         --out odc-report \
         --format HTML \
-        --data odc-data
-        --nvdApiKey $(NVD_API_KEY)
+        --data odc-data \
+        --nvdApiKey $(NVD_API_KEY) \
         --enableExperimental
 
 # Publish Dependency-Check report
