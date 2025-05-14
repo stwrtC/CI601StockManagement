@@ -43,7 +43,6 @@ steps:
         --out odc-report \
         --format HTML \
         --data odc-data \
-        --noupdate \
         --nvdApiKey "$NVD_API_KEY" \
         --enableExperimental
   env:
