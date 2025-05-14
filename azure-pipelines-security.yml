@@ -46,7 +46,7 @@ steps:
 
 # Initialize database only if needed (first run or cache miss)
 - task: Bash@3
-  displayName: 'Initialize Vulnerability DB (no API key)'
+  displayName: 'Initialize Vulnerability DB '
   condition: and(succeeded(), ne(variables['Cache.RestoreStatus'], 'Restored'))
   inputs:
     targetType: 'inline'
@@ -55,6 +55,10 @@ steps:
         --updateonly \
         --data odc-data \
         --noupdate
+        --nvdApiKey "$NVD_API_KEY" \
+        --enableExperimental
+  env:
+    NVD_API_KEY: $(NVD_API_KEY)
 
 # Run the scan with local DB
 - task: Bash@3
