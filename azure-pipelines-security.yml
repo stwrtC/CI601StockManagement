@@ -1,10 +1,3 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
-# azure-pipelines-security.yml
-
 trigger:
   - develop
   - staging
@@ -15,28 +8,60 @@ pool:
 
 variables:
   solution: '**/*.sln'
+  odcCacheKey: dependency-check-v1  # change this if you want to invalidate cache manually
 
 steps:
 - checkout: self
 
-# Run Microsoft Security DevOps
-#- task: MicrosoftSecurityDevOps@1
- # displayName: 'Run Microsoft Security DevOps Analysis'
-
-# Run OWASP Dependency-Check
+# Install .NET 8 SDK
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
     version: '8.0.x'
 
+# Download Dependency-Check CLI
 - task: Bash@3
-  displayName: 'Run OWASP Dependency-Check'
+  displayName: 'Download Dependency-Check'
   inputs:
     targetType: 'inline'
     script: |
       wget https://github.com/jeremylong/DependencyCheck/releases/download/v9.0.7/dependency-check-9.0.7-release.zip
       unzip dependency-check-9.0.7-release.zip -d dependency-check
-      mkdir odc-data
+
+# Restore or create the odc-data cache
+- task: Cache@2
+  inputs:
+    key: 'odc-data-$(odcCacheKey)'
+    path: 'odc-data'
+    restoreKeys: |
+      odc-data-
+
+# Ensure odc-data exists (mkdir is safe even if cache restores)
+- task: Bash@3
+  displayName: 'Prepare odc-data directory'
+  inputs:
+    targetType: 'inline'
+    script: |
+      mkdir -p odc-data
+
+# Initialize database only if needed (first run or cache miss)
+- task: Bash@3
+  displayName: 'Initialize Vulnerability DB (no API key)'
+  condition: and(succeeded(), ne(variables['Cache.RestoreStatus'], 'Restored'))
+  inputs:
+    targetType: 'inline'
+    script: |
+      ./dependency-check/dependency-check/bin/dependency-check.sh \
+        --updateonly \
+        --data odc-data \
+        --noupdate
+
+# Run the scan with local DB
+- task: Bash@3
+  displayName: 'Run OWASP Dependency-Check Scan'
+  inputs:
+    targetType: 'inline'
+    script: |
       ./dependency-check/dependency-check/bin/dependency-check.sh \
         --project "ASP.NET App" \
         --scan . \
@@ -44,13 +69,8 @@ steps:
         --format HTML \
         --data odc-data \
         --noupdate
-        #--nvdApiKey "$NVD_API_KEY" \
-        #--enableExperimental
-  #env:
-    #NVD_API_KEY: $(NVD_API_KEY)
 
-
-# Publish Dependency-Check report
+# Publish the HTML report
 - task: PublishBuildArtifacts@1
   inputs:
     pathToPublish: 'odc-report'
